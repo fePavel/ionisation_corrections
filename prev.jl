@@ -30,19 +30,15 @@ function resample_curve(x, y; n_points=length(x), method=:linear)
     cumulative = [0.0; cumsum(dists)]
     total_length = cumulative[end]
     
-    # 2. Генерируем новые равноотстоящие параметры
     s_new = range(0, total_length, length=n_points)
     
-    # 3. Интерполяция (разные методы)
     if method == :linear
-        # Линейная интерполяция
         itp_x = linear_interpolation(cumulative, x, extrapolation_bc=Line())
         itp_y = linear_interpolation(cumulative, y, extrapolation_bc=Line())
         new_x = itp_x.(s_new)
         new_y = itp_y.(s_new)
         
     elseif method == :spline
-        # Кубические сплайны (требует Dierckx)
         spl_x = Spline1D(cumulative, x; k=3, s=0.0)
         spl_y = Spline1D(cumulative, y; k=3, s=0.0)
         new_x = spl_x(s_new)
@@ -55,13 +51,6 @@ function resample_curve(x, y; n_points=length(x), method=:linear)
     return new_x, new_y
 end
 
-# x, y = x./x[end], α
-# x_new, y_new = resample_curve(x,y)
-# scatter(x,y)
-# scatter(x_new,y_new)
-
-# scatter(x, ones(length(x)))
-# scatter(x_new, ones(length(x)).+1)
 
 function calculate()
     xgrid = range(0, xmax, length=100)
@@ -125,9 +114,7 @@ a_D = [0.9992122870171443, 0.9991806235052536, 0.9991485068532029, 0.99911588932
 0.24141351276401868, 0.236392212368993, 0.23152031121329586]
 
 dx_H_1 = [x_H[i] - x_H[i-1] for i in 2:length(x_H)]
-# dx_H_2 = [x_H[i+1] - x_H[i] for i in 1:length(x_H)-1]
 dx_D_1 = [x_D[i] - x_D[i-1] for i in 2:length(x_D)]
-# dx_D_2 = [x_D[i+1] - x_D[i] for i in 1:length(x_D)-1]
 H_1 = sum(a_H[2:end].*dx_H_1)
 D_1 = sum(a_D[2:end].*dx_D_1)
 H_2 = sum(a_H[1:end-1].*dx_H_1)
